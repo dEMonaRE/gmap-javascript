@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html id="ng-app" ng-app="app">
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<style type="text/css">
+html {
+	height: 100%
+}
+
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0
+}
+
+#map-canvas {
+	height: 100%;
+	width: 100%;
+}
+
+#panel {
+	position: absolute;
+	top: 5px;
+	left: 50%;
+	margin-left: -180px;
+	z-index: 5;
+	background-color: #fff;
+	padding: 5px;
+	border: 1px solid #999;
+}
+
+    .my-drop-zone { border: dotted 3px lightgray; }
+            .nv-file-over { border: dotted 3px red; } /* Default class applied to drop zones on over */
+            .another-file-over-class { border: dotted 3px green; }
+
+            html, body { height: 100%; }
+
+            canvas {
+                background-color: #f3f3f3;
+                -webkit-box-shadow: 3px 3px 3px 0 #e3e3e3;
+                -moz-box-shadow: 3px 3px 3px 0 #e3e3e3;
+                box-shadow: 3px 3px 3px 0 #e3e3e3;
+                border: 1px solid #c3c3c3;
+                height: 100px;
+                margin: 6px 0 0 6px;
+            }
+    
+</style>
+
+
+<script
+	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCgkcoGG04Q7FNAc5IbdTpTiyL2ldaNPmI"></script>
+
+
+ 
+<script type="text/javascript">
+	 var map;
+	 var allMarkers = [];
+	 
+	 function initialize()
+	 {
+	     var myLatlng = new google.maps.LatLng(40.917929, 29.177890);
+	     
+	     map = new google.maps.Map(document.getElementById("map-canvas"), //HARÝTA OLUÞTURMA
+	     {
+	         zoom: 12,
+	         center: myLatlng,
+	         mapTypeId: google.maps.MapTypeId.ROADMAP
+	     });
+
+	     google.maps.event.addListener(map, 'click', function(event) //MARKER YERLEÞTÝRME EVENTÝ
+	     {
+	         placeMarker(event.latLng);
+	     });
+	 }
+
+	 function placeMarker(location) //MARKER YERLEÞTÝRME FONKSÝYONU
+	 {
+		 var image= 'turkcell_ico.png';
+		 
+	     var marker = new google.maps.Marker(
+	     {
+	         position: location,
+	         map: map,
+	         icon: image
+	     });
+
+	     var coords = location.lat().toFixed(6) + ', ' + location.lng().toFixed(6);
+
+	     var infoWindow = new google.maps.InfoWindow(
+	     {
+	         content:
+	        	'<div id="content">' + 
+		        '<p><b>Coordinates</b></p>'+
+		        '<p>'+ coords+'</p>'+
+		        '</div>'
+	     });
+
+	     allMarkers.push(marker);
+	     
+	     google.maps.event.addListener(marker, 'click', function()
+	     {
+	         infoWindow.open(map,marker);
+	     });
+	 }
+	 
+	 
+	function showMarkers() {  //SHOW ALL MARKERS
+		setAllMap(map);
+	}
+	 
+	function setAllMap(map) {  
+		  for (var i = 0; i < allMarkers.length; i++) {
+				allMarkers[i].setMap(map);
+		  }
+	}
+      
+	function clearMarkers() { //HIDE ALL MARKERS
+		  setAllMap(null);
+	}
+	
+	function deleteMarkers() { //REMOVE ALL MARKERS
+		  clearMarkers();
+		  allMarkers = [];
+	}
+	
+	function closeInfoWindows() { //CLOSE INFO WINDOWS ? NOT WORKING	
+		for (var i = 0; i < allMarkers.length; i++) {
+			allMarkers[i].infoWindow.close();
+	  }
+	}
+    </script>
+   
+     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+
+        <!-- Fix for old browsers -->
+        <script type="text/javascript" src="es5-shim.min.js"></script>
+        <script type="text/javascript" src="es5-sham.min.js"></script>
+        <script type="text/javascript" src="jquery-2.1.0.min.js"></script>
+     	<script  type="text/javascript" src="console-sham.js"></script>
+     	
+     	 <!-- gerekliler -->
+        <script  type="text/javascript" src="bootstrap.min.js"></script>
+     	<script type="text/javascript" src="angular.min.js"></script>
+     	<script type="text/javascript" src="angular-file-upload.js"></script>
+     	<script type="text/javascript" src="controllers.js"></script>
+     	
+     	
+     	<!--thumbnails göstermek için-->
+     	<script type="text/javascript" src="directives.js"></script>
+     
+     
+</head>
+
+
+
+<body ng-controller="AppController" nv-file-drop="" uploader="uploader">
+
+        <div class="container">
+
+            
+
+            <div class="row">
+
+                <div class="col-md-3">
+
+                    <h3>Select files</h3>
+
+                    <div ng-show="uploader.isHTML5">
+                        <!-- 3. nv-file-over uploader="link" over-class="className" -->
+                        <div class="well my-drop-zone" nv-file-over="" uploader="uploader">
+                            Base drop zone
+                        </div>
+
+                        <!-- Example: nv-file-drop="" uploader="{Object}" options="{Object}" filters="{String}" -->
+                        <div nv-file-drop="" uploader="uploader" options="{ url: '/foo' }">
+                            <div nv-file-over="" uploader="uploader" over-class="another-file-over-class" class="well my-drop-zone">
+                                Another drop zone with its own settings
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example: nv-file-select="" uploader="{Object}" options="{Object}" filters="{String}" -->
+                    <input type="file" nv-file-select="" uploader="uploader" multiple  /><br/>
+
+                </div>
+
+                <div class="col-md-9" style="margin-bottom: 40px">
+                    <h2>Uploads only images (with canvas preview)</h2>
+                    <h3>The queue</h3>
+                    <p>Queue length: {{ uploader.queue.length }}</p>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th width="50%">Name</th>
+                                <th ng-show="uploader.isHTML5">Size</th>
+                                <th ng-show="uploader.isHTML5">Progress</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in uploader.queue">
+                                <td>
+                                    <strong>{{ item.file.name }}</strong>
+                                    <!-- Image preview -->
+                                    <!--auto height-->
+                                    <!--<div ng-thumb="{ file: item.file, width: 100 }"></div>-->
+                                    <!--auto width-->
+                                    <div ng-show="uploader.isHTML5" ng-thumb="{ file: item._file, height: 100 }"></div>
+                                    <!--fixed width and height -->
+                                    <!--<div ng-thumb="{ file: item.file, width: 100, height: 100 }"></div>-->
+                                </td>
+                                <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+                                <td ng-show="uploader.isHTML5">
+                                    <div class="progress" style="margin-bottom: 0;">
+                                        <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                                    <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                                    <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                                </td>
+                                <td nowrap>
+                                    <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                        <span class="glyphicon glyphicon-upload"></span> Upload
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
+                                        <span class="glyphicon glyphicon-ban-circle"></span> Cancel
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
+                                        <span class="glyphicon glyphicon-trash"></span> Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div>
+                        <div>
+                            Queue progress:
+                            <div class="progress" style="">
+                                <div class="progress-bar" role="progressbar" ng-style="{ 'width': uploader.progress + '%' }"></div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+                            <span class="glyphicon glyphicon-upload"></span> Upload all
+                        </button>
+                        <button type="button" class="btn btn-warning btn-s" ng-click="uploader.cancelAll()" ng-disabled="!uploader.isUploading">
+                            <span class="glyphicon glyphicon-ban-circle"></span> Cancel all
+                        </button>
+                        <button type="button" class="btn btn-danger btn-s" ng-click="uploader.clearQueue()" ng-disabled="!uploader.queue.length">
+                            <span class="glyphicon glyphicon-trash"></span> Remove all
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <body onload="initialize()"> -->
+	<!-- <div id="map-canvas" style="height:300px;" ></div>
+	<div id="panel">
+		<input onclick="clearMarkers();" type=button value="Hide Markers">
+		<input onclick="showMarkers();" type=button value="Show All Markers">
+		<input onclick="deleteMarkers();" type=button value="Delete Markers">
+		</div>
+ -->
+
+</body>
+</html>
